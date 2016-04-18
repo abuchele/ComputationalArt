@@ -1,16 +1,21 @@
-""" This is my computational art project!
-    Anna Buchele """
+""" 
+    Anna Buchele
+
+    This is my computational art project revision for Mini Project 5. 
+    The original program took ~31 seconds to run, so for MP5 I profiled it 
+    and made it a lot faster. As a side effect, the art looks better since
+    I had to rewrite a lot of it and fixed some bugs while doing that. 
+    It takes ~2 seconds to run now!
+
+    """
 
 import random
 from PIL import Image
 import math
 
-
-
 def build_random_function(min_depth, max_depth):
     """ Builds a random function of depth at least min_depth and depth
-        at most max_depth (see assignment writeup for definition of depth
-        in this context)
+        at most max_depth.
 
         min_depth: the minimum depth of the random function
         max_depth: the maximum depth of the random function
@@ -18,6 +23,7 @@ def build_random_function(min_depth, max_depth):
                  (see assignment writeup for details on the representation of
                  these functions)
     """
+    #calculating the depth
 
     if min_depth < 1:
         if max_depth < 1:
@@ -28,10 +34,15 @@ def build_random_function(min_depth, max_depth):
         depth = min_depth
     else:
         depth=random.randint(min_depth,max_depth)  
-
     functout =[]
+
+    #full recursive proved to be problematic, so rewrote as for-loop
     for n in range (depth):
         
+        # rolling for random vals seperately, so if the r-value 
+        # means we don't need a k or m value, we don't waste
+        # time getting it
+
         r= random.randint(0,9)
 
         if r == 0: 
@@ -40,19 +51,20 @@ def build_random_function(min_depth, max_depth):
             functin= ["x"]
         elif r == 2:
             functin= ["1minus"]
+        elif r == 3:
+            functin= ["arcsin"]
         else:
             if r < 8:
                 k= random.randint(1,20)
-                if r == 3:
+                if r == 4:
                     functin= ["cos_pi",k] 
-                elif r == 4:
-                    functin= ["sin_pi", k]
                 elif r == 5:
-                    functin= ["pwr", k]
+                    functin= ["sin_pi", k]
                 elif r == 6:
-                    functin= ["atan", k]
+                    functin= ["pwr", k]
                 elif r == 7:
-                    functin= ["arcsin", k]
+                    functin= ["atan", k]
+
             else:
                 m = build_random_function(1,1)
                 if r == 8:
@@ -82,6 +94,7 @@ def evaluate_random_function(f, x, y):
     ans = 0
     pre = x * y
     for f_piece in f:
+        # if f_piece is only one item long:
         if f_piece == "x":
             ans = x 
         elif f_piece == "y":
@@ -89,6 +102,9 @@ def evaluate_random_function(f, x, y):
         elif f_piece == "1minus":
             ans = 1-abs(pre)
         else:
+            # if f_piece is longer than one item:
+            # these are the only functions that could be longer
+            # than one item that don't require k 
             part = f_piece[0]
             if part == "x":
                 ans = x * pre
@@ -97,6 +113,8 @@ def evaluate_random_function(f, x, y):
             elif part == "arcsin": 
                 ans =  math.asin(pre)/(math.pi/2)
             else:
+                # k is 2nd val, either fn or integer. if fn is 'prod'
+                # or 'avg', k must be fn. Otherwise, k is integer.
                 k = f_piece[1]
                 if part == 'prod': 
                     ans= (evaluate_random_function(k,x,y))*(pre)
